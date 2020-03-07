@@ -9,6 +9,7 @@ public class SpitController : MonoBehaviour
     public float shiftBound = 8f;
     public float pullSpeed = 15f;
     public float pullDiff = -3f;
+    public float swapSpeed = 10f;
 
     private float shiftMin;
     private float shiftMax;
@@ -17,6 +18,9 @@ public class SpitController : MonoBehaviour
     private int pullDirection;
     private bool isPullAdjusting = false;
     private bool isPulled = false;
+    private GameObject food;
+    private bool isFoodSwapping = false;
+    private int swapDirection = 1;
 
     void Start()
     {
@@ -30,6 +34,11 @@ public class SpitController : MonoBehaviour
         depthMin = pullInwards ? pullDepth : startDepth;
         depthMax = pullInwards ? startDepth : pullDepth;
         pullDirection = pullInwards ? -1 : 1;
+
+        if (transform.childCount == 1) 
+        {
+            food = transform.GetChild(0).gameObject;
+        }
     }
 
     void Update()
@@ -54,6 +63,16 @@ public class SpitController : MonoBehaviour
         if (isPullAdjusting)
         {
             UpdatePull();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            isFoodSwapping = true;
+        }
+
+        if (isFoodSwapping)
+        {
+            SwapFood();
         }
     }
 
@@ -93,5 +112,37 @@ public class SpitController : MonoBehaviour
             transform.position.y,
             newZ
         );
+    }
+
+    void SwapFood()
+    {
+        var xDiff = swapSpeed * Time.deltaTime * swapDirection;
+        var unclampedX = food.transform.position.x + xDiff;
+        var spitX = transform.position.x;
+        // TODO Replace this with a screen aware rifting
+        var riftPoint = spitX + shiftBound;
+        var newX = Mathf.Clamp(unclampedX, spitX, riftPoint);
+
+        food.transform.position = new Vector3(
+            newX,
+            food.transform.position.y,
+            food.transform.position.z
+        );
+        
+        if (newX == spitX || newX == riftPoint) 
+        {
+            swapDirection *= -1;
+
+            if (newX == spitX)
+            {
+                isFoodSwapping = false;
+            }
+            else 
+            {
+                var newFood = Instantiate(food, transform);
+                Destroy(food);
+                food = newFood;
+            }
+        }
     }
 }

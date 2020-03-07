@@ -107,7 +107,7 @@ GameObject:
   - component: {fileID: 5866119289491799554}
   - component: {fileID: 5866119289491799558}
   m_Layer: 0
-  m_Name: Rotisserie
+  m_Name: Spit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -206,3 +206,4 @@ MonoBehaviour:
   shiftBound: 8
   pullSpeed: 15
   pullDiff: -3
+  swapSpeed: 10
