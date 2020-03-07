@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RotisserieController : MonoBehaviour
+public class SpitController : MonoBehaviour
 {
     public float rotationSpeed = 50f;
     public float shiftSpeed = 5f;

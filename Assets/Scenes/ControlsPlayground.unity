@@ -306,7 +306,7 @@ PrefabInstance:
     - target: {fileID: 5866119289491799555, guid: 79e7dadefb1db6b4280fbdfca1b8e049,
         type: 3}
       propertyPath: m_Name
-      value: Rotisserie
+      value: Spit
       objectReference: {fileID: 0}
     - target: {fileID: 5866119289491799559, guid: 79e7dadefb1db6b4280fbdfca1b8e049,
         type: 3}
