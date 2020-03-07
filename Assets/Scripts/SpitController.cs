@@ -5,22 +5,30 @@ using UnityEngine;
 public class SpitController : MonoBehaviour
 {
     public float rotationSpeed = 50f;
+
     public float shiftSpeed = 5f;
     public float shiftBound = 8f;
+
     public float pullSpeed = 15f;
     public float pullDiff = -3f;
+    
     public float swapSpeed = 10f;
 
     private float shiftMin;
     private float shiftMax;
+
     private float depthMin;
     private float depthMax;
+
     private int pullDirection;
     private bool isPullAdjusting = false;
     private bool isPulled = false;
+
     private GameObject food;
     private bool isFoodSwapping = false;
     private int swapDirection = 1;
+    private float swapPoint;
+    private float swapBuffer = 3f;
 
     void Start()
     {
@@ -39,6 +47,13 @@ public class SpitController : MonoBehaviour
         {
             food = transform.GetChild(0).gameObject;
         }
+    
+        var screenEdgeAtSpit = Camera.main.ScreenToWorldPoint(new Vector3(
+            Screen.width, 
+            Screen.height, 
+            transform.position.z - Camera.main.transform.position.z
+        ));
+        swapPoint = screenEdgeAtSpit.x + swapBuffer;
     }
 
     void Update()
@@ -119,9 +134,7 @@ public class SpitController : MonoBehaviour
         var xDiff = swapSpeed * Time.deltaTime * swapDirection;
         var unclampedX = food.transform.position.x + xDiff;
         var spitX = transform.position.x;
-        // TODO Replace this with a screen aware rifting
-        var riftPoint = spitX + shiftBound;
-        var newX = Mathf.Clamp(unclampedX, spitX, riftPoint);
+        var newX = Mathf.Clamp(unclampedX, spitX, swapPoint);
 
         food.transform.position = new Vector3(
             newX,
@@ -129,7 +142,7 @@ public class SpitController : MonoBehaviour
             food.transform.position.z
         );
         
-        if (newX == spitX || newX == riftPoint) 
+        if (newX == spitX || newX == swapPoint) 
         {
             swapDirection *= -1;
 
