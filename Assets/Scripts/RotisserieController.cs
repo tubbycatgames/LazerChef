@@ -6,84 +6,91 @@ public class RotisserieController : MonoBehaviour
 {
     public float rotationSpeed = 50f;
     public float shiftSpeed = 5f;
-    public float maxShift = 8f;
+    public float shiftBound = 8f;
     public float pullSpeed = 15f;
-    public float pullDepth = -43f;
+    public float pullDepth = -3f;
 
-    private float startDepth;
+    private float shiftMin;
+    private float shiftMax;
+    private float depthMin;
+    private float depthMax;
+    private int pullDirection;
     private bool isPullAdjusting = false;
     private bool isPulled = false;
 
     void Start()
     {
-        startDepth = transform.position.z;
+        var startShift = transform.position.x;
+        shiftMin = transform.position.x - shiftBound;
+        shiftMax = transform.position.x + shiftBound;
+
+        var startDepth = transform.position.z;
+        var pullInwards = pullDepth < startDepth;
+        depthMin = pullInwards ? pullDepth : startDepth;
+        depthMax = pullInwards ? startDepth : pullDepth;
+        pullDirection = pullInwards ? -1 : 1;
     }
 
     void Update()
     {
-        UpdateRotation();
-        UpdateShift();
-        UpdatePull();
+        var verticalInput = Input.GetAxis("Vertical");
+        if (verticalInput != 0)
+        {
+            UpdateRotation(-verticalInput);
+        }
+
+        var horizontalInput = Input.GetAxis("Horizontal");
+        if (horizontalInput != 0)
+        {
+            UpdateShift(horizontalInput);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            isPullAdjusting = true;
+        }
+
+        if (isPullAdjusting)
+        {
+            UpdatePull();
+        }
     }
 
-    void UpdateRotation()
+    void UpdateRotation(float direction)
     {
-        var verticalInput = Input.GetAxis("Vertical");
-        var yDiff = rotationSpeed * verticalInput * Time.deltaTime * -1;
+        var yDiff = rotationSpeed * direction * Time.deltaTime;
         transform.Rotate(0.0f, yDiff, 0.0f);
     }
 
-    void UpdateShift()
+    void UpdateShift(float direction)
     {
-        var horizontalInput = Input.GetAxis("Horizontal");
-        var xDiff = Input.GetAxis("Horizontal") * shiftSpeed * Time.deltaTime;
-        var newX = transform.position.x + xDiff;
-        if (Mathf.Abs(newX) < maxShift)
-        {
-            transform.position = new Vector3(
-                newX,
-                transform.position.y,
-                transform.position.z
-            );
-        }
+        var xDiff = direction * shiftSpeed * Time.deltaTime;
+        var unclampedX = transform.position.x + xDiff;
+        var newX = Mathf.Clamp(unclampedX, shiftMin, shiftMax);
+        transform.position = new Vector3(
+            newX,
+            transform.position.y,
+            transform.position.z
+        );
     }
 
     void UpdatePull()
     {
-        if (isPullAdjusting)
+        var pullFactor = isPulled ? -pullDirection : pullDirection;
+        var pullDiff = pullSpeed * Time.deltaTime * pullFactor;
+        var unclampedZ = transform.position.z + pullDiff;
+        var newZ = Mathf.Clamp(unclampedZ, depthMin, depthMax);
+
+        if (newZ == depthMin || newZ == depthMax) 
         {
-            var newZ = transform.position.z;
-            var pullDiff = pullSpeed * Time.deltaTime;
-
-            if (isPulled) 
-            {
-                newZ = Mathf.Min(newZ + pullDiff, startDepth);
-            }
-            else 
-            {
-                newZ = Mathf.Max(newZ - pullDiff, pullDepth);
-            }
-
-            transform.position = new Vector3(
-                transform.position.x,
-                transform.position.y,
-                newZ
-            );
-
-            
-            if (newZ == 0f || newZ == pullDepth) 
-            {
-                isPullAdjusting = false;
-                isPulled = !isPulled;
-            }
-
+            isPullAdjusting = false;
+            isPulled = !isPulled;
         }
-        else
-        {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                isPullAdjusting = true;
-            }
-        }
+
+        transform.position = new Vector3(
+            transform.position.x,
+            transform.position.y,
+            newZ
+        );
     }
 }
