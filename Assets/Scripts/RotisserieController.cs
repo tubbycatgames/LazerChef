@@ -8,7 +8,7 @@ public class RotisserieController : MonoBehaviour
     public float shiftSpeed = 5f;
     public float shiftBound = 8f;
     public float pullSpeed = 15f;
-    public float pullDepth = -3f;
+    public float pullDiff = -3f;
 
     private float shiftMin;
     private float shiftMax;
@@ -25,7 +25,8 @@ public class RotisserieController : MonoBehaviour
         shiftMax = transform.position.x + shiftBound;
 
         var startDepth = transform.position.z;
-        var pullInwards = pullDepth < startDepth;
+        var pullDepth = startDepth + pullDiff;
+        var pullInwards = pullDiff < 0;
         depthMin = pullInwards ? pullDepth : startDepth;
         depthMax = pullInwards ? startDepth : pullDepth;
         pullDirection = pullInwards ? -1 : 1;
@@ -77,8 +78,8 @@ public class RotisserieController : MonoBehaviour
     void UpdatePull()
     {
         var pullFactor = isPulled ? -pullDirection : pullDirection;
-        var pullDiff = pullSpeed * Time.deltaTime * pullFactor;
-        var unclampedZ = transform.position.z + pullDiff;
+        var zDiff = pullSpeed * Time.deltaTime * pullFactor;
+        var unclampedZ = transform.position.z + zDiff;
         var newZ = Mathf.Clamp(unclampedZ, depthMin, depthMax);
 
         if (newZ == depthMin || newZ == depthMax) 

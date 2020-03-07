@@ -314,9 +314,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotationSpeed: 50
   shiftSpeed: 5
-  maxShift: 8
+  shiftBound: 8
   pullSpeed: 15
-  pullDepth: -3
+  pullDiff: -3
 --- !u!1 &662135515
 GameObject:
   m_ObjectHideFlags: 0
