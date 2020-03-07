@@ -4,14 +4,20 @@ using UnityEngine;
 
 public class RotisserieController : MonoBehaviour
 {
-    public float rotationSpeed = 1f;
-    public float shiftSpeed = 0.5f;
-    public float maxShift = 5f;
-    public float pullSpeed = 1f;
-    public float pullDepth = 3f;
+    public float rotationSpeed = 50f;
+    public float shiftSpeed = 5f;
+    public float maxShift = 8f;
+    public float pullSpeed = 15f;
+    public float pullDepth = -43f;
 
+    private float startDepth;
     private bool isPullAdjusting = false;
     private bool isPulled = false;
+
+    void Start()
+    {
+        startDepth = transform.position.z;
+    }
 
     void Update()
     {
@@ -23,14 +29,15 @@ public class RotisserieController : MonoBehaviour
     void UpdateRotation()
     {
         var verticalInput = Input.GetAxis("Vertical");
-        var newRotation = rotationSpeed * verticalInput * Time.deltaTime;
-        transform.Rotate(0.0f, newRotation, 0.0f);
+        var yDiff = rotationSpeed * verticalInput * Time.deltaTime * -1;
+        transform.Rotate(0.0f, yDiff, 0.0f);
     }
 
     void UpdateShift()
     {
         var horizontalInput = Input.GetAxis("Horizontal");
-        var newX = (horizontalInput * shiftSpeed * Time.deltaTime) + transform.position.x;
+        var xDiff = Input.GetAxis("Horizontal") * shiftSpeed * Time.deltaTime;
+        var newX = transform.position.x + xDiff;
         if (Mathf.Abs(newX) < maxShift)
         {
             transform.position = new Vector3(
@@ -50,15 +57,11 @@ public class RotisserieController : MonoBehaviour
 
             if (isPulled) 
             {
-                newZ = Mathf.Max(newZ - pullDiff, 0f);
+                newZ = Mathf.Min(newZ + pullDiff, startDepth);
             }
             else 
             {
-                newZ = Mathf.Min(newZ + pullDiff, maxShift);
-            }
-
-            if (newZ == 0f || newZ == maxShift) {
-                isPullAdjusting = false;
+                newZ = Mathf.Max(newZ - pullDiff, pullDepth);
             }
 
             transform.position = new Vector3(
@@ -67,13 +70,19 @@ public class RotisserieController : MonoBehaviour
                 newZ
             );
 
+            
+            if (newZ == 0f || newZ == pullDepth) 
+            {
+                isPullAdjusting = false;
+                isPulled = !isPulled;
+            }
+
         }
         else
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 isPullAdjusting = true;
-                isPulled = !isPulled;
             }
         }
     }
