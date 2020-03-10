@@ -89,9 +89,10 @@ public class SpitController : MonoBehaviour
             UpdatePull();
         }
 
-        if (Input.GetKeyDown(KeyCode.Return))
+        if (Input.GetKeyDown(KeyCode.Return) && !isFoodSwapping)
         {
             isFoodSwapping = true;
+            // SFX Food being Removed from Spit
         }
 
         if (isFoodSwapping)
@@ -168,6 +169,7 @@ public class SpitController : MonoBehaviour
                 var newFood = Instantiate(food, transform);
                 Destroy(food);
                 food = newFood;
+                // SFX Food Being Added to Spit
             }
         }
     }
