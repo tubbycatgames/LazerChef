@@ -20,10 +20,12 @@ public class Lazer : MonoBehaviour
         if (Physics.Raycast(transform.position, up, out hit) && hit.collider)
         {
             beam.SetPosition(1, hit.point);
+            // SFX Lazer Striking Object
         }
         else
         {
             beam.SetPosition(1, up * maxDistance);
+            // SFX Lazer emitting without strike
         }
     }
 }
