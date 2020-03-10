@@ -11,7 +11,7 @@ public class SpitController : MonoBehaviour
 
     public float pullSpeed = 15f;
     public float pullDiff = -3f;
-    
+
     public float swapSpeed = 10f;
 
     private float shiftMin;
@@ -47,7 +47,6 @@ public class SpitController : MonoBehaviour
         {
             food = transform.GetChild(0).gameObject;
         }
-    
         var screenEdgeAtSpit = Camera.main.ScreenToWorldPoint(new Vector3(
             Screen.width, 
             Screen.height, 
