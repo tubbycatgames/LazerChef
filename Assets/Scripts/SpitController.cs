@@ -69,9 +69,19 @@ public class SpitController : MonoBehaviour
             UpdateShift(horizontalInput);
         }
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && !isPullAdjusting)
         {
             isPullAdjusting = true;
+            // SFX Spit Being Put into Lazer
+            if (isPulled) 
+            {
+
+            }
+            // SFX Spit Being Pulled Away From Lazer
+            else
+            {
+
+            }
         }
 
         if (isPullAdjusting)
@@ -94,6 +104,8 @@ public class SpitController : MonoBehaviour
     {
         var yDiff = rotationSpeed * direction * Time.deltaTime;
         transform.Rotate(0.0f, yDiff, 0.0f);
+
+        // SFX Spit Being Rotated
     }
 
     void UpdateShift(float direction)
@@ -106,6 +118,8 @@ public class SpitController : MonoBehaviour
             transform.position.y,
             transform.position.z
         );
+
+        // SFX Spit Being Shifted
     }
 
     void UpdatePull()
