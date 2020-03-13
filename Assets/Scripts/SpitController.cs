@@ -1,21 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class SpitController : MonoBehaviour
 {
     public float rotationSpeed = 50f;
 
-    public float shiftSpeed = 5f;
-    public float shiftBound = 8f;
-
     public float pullSpeed = 15f;
     public float pullDiff = -3f;
 
     public float swapSpeed = 10f;
-
-    private float shiftMin;
-    private float shiftMax;
 
     private float depthMin;
     private float depthMax;
@@ -32,10 +24,6 @@ public class SpitController : MonoBehaviour
 
     void Start()
     {
-        var startShift = transform.position.x;
-        shiftMin = transform.position.x - shiftBound;
-        shiftMax = transform.position.x + shiftBound;
-
         var startDepth = transform.position.z;
         var pullDepth = startDepth + pullDiff;
         var pullInwards = pullDiff < 0;
@@ -43,13 +31,13 @@ public class SpitController : MonoBehaviour
         depthMax = pullInwards ? startDepth : pullDepth;
         pullDirection = pullInwards ? -1 : 1;
 
-        if (transform.childCount == 1) 
+        if (transform.childCount == 1)
         {
             food = transform.GetChild(0).gameObject;
         }
         var screenEdgeAtSpit = Camera.main.ScreenToWorldPoint(new Vector3(
-            Screen.width, 
-            Screen.height, 
+            Screen.width,
+            Screen.height,
             transform.position.z - Camera.main.transform.position.z
         ));
         swapPoint = screenEdgeAtSpit.x + swapBuffer;
@@ -63,17 +51,12 @@ public class SpitController : MonoBehaviour
             UpdateRotation(-verticalInput);
         }
 
-        var horizontalInput = Input.GetAxis("Horizontal");
-        if (horizontalInput != 0)
-        {
-            UpdateShift(horizontalInput);
-        }
 
         if (Input.GetKeyDown(KeyCode.Space) && !isPullAdjusting)
         {
             isPullAdjusting = true;
             // SFX Spit Being Put into Lazer
-            if (isPulled) 
+            if (isPulled)
             {
 
             }
@@ -109,20 +92,6 @@ public class SpitController : MonoBehaviour
         // SFX Spit Being Rotated
     }
 
-    void UpdateShift(float direction)
-    {
-        var xDiff = direction * shiftSpeed * Time.deltaTime;
-        var unclampedX = transform.position.x + xDiff;
-        var newX = Mathf.Clamp(unclampedX, shiftMin, shiftMax);
-        transform.position = new Vector3(
-            newX,
-            transform.position.y,
-            transform.position.z
-        );
-
-        // SFX Spit Being Shifted
-    }
-
     void UpdatePull()
     {
         var pullFactor = isPulled ? -pullDirection : pullDirection;
@@ -130,7 +99,7 @@ public class SpitController : MonoBehaviour
         var unclampedZ = transform.position.z + zDiff;
         var newZ = Mathf.Clamp(unclampedZ, depthMin, depthMax);
 
-        if (newZ == depthMin || newZ == depthMax) 
+        if (newZ == depthMin || newZ == depthMax)
         {
             isPullAdjusting = false;
             isPulled = !isPulled;
@@ -155,8 +124,8 @@ public class SpitController : MonoBehaviour
             food.transform.position.y,
             food.transform.position.z
         );
-        
-        if (newX == spitX || newX == swapPoint) 
+
+        if (newX == spitX || newX == swapPoint)
         {
             swapDirection *= -1;
 
@@ -164,7 +133,7 @@ public class SpitController : MonoBehaviour
             {
                 isFoodSwapping = false;
             }
-            else 
+            else
             {
                 var newFood = Instantiate(food, transform);
                 Destroy(food);
