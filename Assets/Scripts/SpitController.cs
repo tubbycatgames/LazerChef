@@ -3,20 +3,9 @@
 public class SpitController : MonoBehaviour
 {
     public float rotationSpeed = 50f;
-
-    public float pullSpeed = 15f;
-    public float pullDiff = -3f;
-
     public float swapSpeed = 10f;
+    public GameObject food;
 
-    private float depthMin;
-    private float depthMax;
-
-    private int pullDirection;
-    private bool isPullAdjusting = false;
-    private bool isPulled = false;
-
-    private GameObject food;
     private bool isFoodSwapping = false;
     private int swapDirection = 1;
     private float swapPoint;
@@ -24,17 +13,6 @@ public class SpitController : MonoBehaviour
 
     void Start()
     {
-        var startDepth = transform.position.z;
-        var pullDepth = startDepth + pullDiff;
-        var pullInwards = pullDiff < 0;
-        depthMin = pullInwards ? pullDepth : startDepth;
-        depthMax = pullInwards ? startDepth : pullDepth;
-        pullDirection = pullInwards ? -1 : 1;
-
-        if (transform.childCount == 1)
-        {
-            food = transform.GetChild(0).gameObject;
-        }
         var screenEdgeAtSpit = Camera.main.ScreenToWorldPoint(new Vector3(
             Screen.width,
             Screen.height,
@@ -51,27 +29,6 @@ public class SpitController : MonoBehaviour
             UpdateRotation(-verticalInput);
         }
 
-
-        if (Input.GetKeyDown(KeyCode.Space) && !isPullAdjusting)
-        {
-            isPullAdjusting = true;
-            // SFX Spit Being Put into Lazer
-            if (isPulled)
-            {
-
-            }
-            // SFX Spit Being Pulled Away From Lazer
-            else
-            {
-
-            }
-        }
-
-        if (isPullAdjusting)
-        {
-            UpdatePull();
-        }
-
         if (Input.GetKeyDown(KeyCode.Return) && !isFoodSwapping)
         {
             isFoodSwapping = true;
@@ -86,30 +43,10 @@ public class SpitController : MonoBehaviour
 
     void UpdateRotation(float direction)
     {
-        var yDiff = rotationSpeed * direction * Time.deltaTime;
-        transform.Rotate(0.0f, yDiff, 0.0f);
+        var xDiff = rotationSpeed * direction * Time.deltaTime;
+        transform.Rotate(xDiff, 0.0f, 0.0f);
 
         // SFX Spit Being Rotated
-    }
-
-    void UpdatePull()
-    {
-        var pullFactor = isPulled ? -pullDirection : pullDirection;
-        var zDiff = pullSpeed * Time.deltaTime * pullFactor;
-        var unclampedZ = transform.position.z + zDiff;
-        var newZ = Mathf.Clamp(unclampedZ, depthMin, depthMax);
-
-        if (newZ == depthMin || newZ == depthMax)
-        {
-            isPullAdjusting = false;
-            isPulled = !isPulled;
-        }
-
-        transform.position = new Vector3(
-            transform.position.x,
-            transform.position.y,
-            newZ
-        );
     }
 
     void SwapFood()
